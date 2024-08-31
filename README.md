@@ -184,10 +184,71 @@ LV_IMG_DECLARE(corro01); // new line
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 ```
 
+Finally, further down in the same file edit this section of code
+
+```c
+int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
+    widget->obj = lv_obj_create(parent);
+    lv_obj_set_size(widget->obj, 160, 68);
+    lv_obj_t *top = lv_canvas_create(widget->obj);
+    lv_obj_align(top, LV_ALIGN_TOP_RIGHT, 0, 0);
+    lv_canvas_set_buffer(top, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
+
+    lv_obj_t *art = lv_img_create(widget->obj);
+    bool random = sys_rand32_get() & 1;
+    lv_img_set_src(art, random ? &balloon : &mountain);
+    lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    sys_slist_append(&widgets, &widget->node);
+    widget_battery_status_init();
+    widget_peripheral_status_init();
+
+    return 0;
+}
+```
+
+to look like this (changing corro01 for the name of your file, if different)
+
+```c
+int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
+    widget->obj = lv_obj_create(parent);
+    lv_obj_set_size(widget->obj, 160, 68);
+    lv_obj_t *top = lv_canvas_create(widget->obj);
+    lv_obj_align(top, LV_ALIGN_TOP_RIGHT, 0, 0);
+    lv_canvas_set_buffer(top, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
+
+    lv_obj_t *art = lv_img_create(widget->obj);
+    //bool random = sys_rand32_get() & 1;
+    //lv_img_set_src(art, random ? &balloon : &mountain);
+    lv_img_set_src(art, &corro01) //new line
+    lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    sys_slist_append(&widgets, &widget->node);
+    widget_battery_status_init();
+    widget_peripheral_status_init();
+
+    return 0;
+}
+```
+
+The "bool random" line that we commented out gets a random 0 or 1 number every time your board boots or resets and that random number is then used in the next line in a 'ternary expression' that selects the &balloon image reference if 1 and &mountain if it is 0.
+
+In our case we don't need that to show our 1 new image so we can just set that image directly in the lv_img_set_src function
+
+#### Congratulations
+That's all you need to edit. We took our art, rotated it 90 degrees clockwise, we converted it to a C array, added it to the art.c file and told the perepheral.c to use our new our new image. To learn how to use your new module with your new static image, head to the [usage](#usage) section.
+
+
+## Adding an Animation
+
+An animation is just multiple pictures so we can build on what we learned in the previous section and add multiple images into the art.c file and then we'll learn how to set up an animation.
+
 
 ## Usage
 
 To use this module, first add it to your config/west.yml by adding a new entry to remotes and projects:
+
+**If you have cloned or forked this repository, replace the url-base: with your forked or cloned url base**
 
 ```yml
 manifest:
@@ -219,3 +280,59 @@ include:
   - board: nice_nano_v2
     shield: urchin_right nice_view_adapter nice_view_custom #custom shield
 ```
+
+
+## Renaming your module
+What if you want to name your module something other than "nice_view_custom"?
+
+Here I'll attempt to explain the various files and names that matter
+
+The name field used in config/west.yml under projects:
+
+```yml
+manifest:
+  remotes:
+      # zmk official
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+    - name: gpeye
+      url-base: https://github.com/GPeye
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: main
+      import: app/west.yml
+    - name: urchin-peripheral-animation #<---- Here
+      remote: gpeye
+      revision: main
+  self:
+    path: config
+```
+
+Is the name of your fork or cloned repo which you can easily change in github
+
+---
+
+The name used as the shield name in the build.yaml
+```yml
+---
+include:
+  - board: nice_nano_v2
+    shield: urchin_left nice_view_adapter  nice_view_custom #<--- Here
+  - board: nice_nano_v2
+    shield: urchin_right nice_view_adapter nice_view_custom
+```
+
+You will want to change in the following place:
+
+The folder name at `boards/shields/nice_view_custom`
+The file names inside that folder:
+- `nice_view_custom.conf`
+- `nice_view_custom.overlay`
+- `nice_view_custom.zmk.yml`
+
+Inside `nice_view_custom.zmk.yml` update the Id and perhaps the name (though not strictly necessary)
+
+Inside Kconfig.shield update line 5 and line 4, then update whatever you change the config name for line 4 to be, you want line 4 of Kconfig.defconfg to match it. 
+
+That should be everything, letting you share your customized animation or graphic module with others using your desired name.
