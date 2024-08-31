@@ -23,20 +23,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include "peripheral_status.h"
 
+LV_IMG_DECLARE(balloon);
+LV_IMG_DECLARE(mountain);
 LV_IMG_DECLARE(corro01);
-LV_IMG_DECLARE(corro02);
-LV_IMG_DECLARE(corro03);
-LV_IMG_DECLARE(corro04);
-LV_IMG_DECLARE(corro05);
-LV_IMG_DECLARE(corro06);
-LV_IMG_DECLARE(corro07);
-LV_IMG_DECLARE(corro08);
-LV_IMG_DECLARE(corro09);
-LV_IMG_DECLARE(corro10);
-LV_IMG_DECLARE(corro11);
-LV_IMG_DECLARE(corro12);
-
-
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 

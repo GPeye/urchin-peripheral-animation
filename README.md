@@ -114,9 +114,9 @@ This file exists just to hold the c array data that makes up our art for referen
 
 ## Adding a Static Image
 
-*Even if you want to add an animation, it's good to cover how to swap out a static image first and build off that knowledge when implementing an animation*
+*Even if you just want to add an animation, it's good to cover how to swap out a static image first and build off that knowledge when implementing an animation*
 
-Open the covnerted C file for the art you want and copy everything **After** the 
+Open the converted C file for the art you want and copy everything **After** the 
 
 ```c
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
@@ -126,6 +126,12 @@ Open the covnerted C file for the art you want and copy everything **After** the
 block
 
 and paste it at the end of the `/boards/shields/nice_view_custom/widgets/art.c` file.
+
+---
+
+⚠️ Note: Somewhat little known fact. For small edits on github, you may not need an editor at all. On the main page of your cloned / forked repo, pressing the period key (.) will open the repo up in VS Code, right in your browser, allowing you to edit files without the need for git or downloading anything. It's perfect for the kind of edits we'll be doing.
+
+---
 
 Near the top of what you pasted, find the following section
 
@@ -155,6 +161,8 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CORRO01 u
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf0,
 ~~~~
 ```
+
+#### See `/assets/example/static/art.c` for reference
 
 Next, find the name of your image const, which should be based off your original image name, by scrolling to the very bottom and finding the section that looks like this
 
@@ -231,6 +239,9 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
 }
 ```
 
+#### See `/assets/example/static/peripheral_status.c` for full reference
+
+
 The "bool random" line that we commented out gets a random 0 or 1 number every time your board boots or resets and that random number is then used in the next line in a 'ternary expression' that selects the &balloon image reference if 1 and &mountain if it is 0.
 
 In our case we don't need that to show our 1 new image so we can just set that image directly in the lv_img_set_src function
@@ -243,12 +254,122 @@ That's all you need to edit. We took our art, rotated it 90 degrees clockwise, w
 
 An animation is just multiple pictures so we can build on what we learned in the previous section and add multiple images into the art.c file and then we'll learn how to set up an animation.
 
+First, just like for the static image, copy the C file contents for each of your generated C files to the art.c file, making sure to update each one with the inverted color index section. If you know you absolutely will not use the color inversion config, then you can technically skip this step.
+
+You can find an example art file in `/assets/example/animated/art.c`
+Notice, you can remove the balloon and mountain if they are not going to be used.
+
+Next, update the peripheral_status.c file, adding a `LV_IMG_DECLARE(<filename>);` line for each file you added to the `art.c` file.
+
+Just below those lines, add an array to hold references to each of our images like this
+
+```c
+LV_IMG_DECLARE(corro01);
+LV_IMG_DECLARE(corro02);
+LV_IMG_DECLARE(corro03);
+LV_IMG_DECLARE(corro04);
+LV_IMG_DECLARE(corro05);
+LV_IMG_DECLARE(corro06);
+LV_IMG_DECLARE(corro07);
+LV_IMG_DECLARE(corro08);
+LV_IMG_DECLARE(corro09);
+LV_IMG_DECLARE(corro10);
+LV_IMG_DECLARE(corro11);
+LV_IMG_DECLARE(corro12);
+
+const lv_img_dsc_t *anim_imgs[] = {
+    &corro01,
+    &corro02,
+    &corro03,
+    &corro04,
+    &corro05,
+    &corro06,
+    &corro07,
+    &corro08,
+    &corro09,
+    &corro10,
+    &corro11,
+    &corro12,
+};
+```
+In my case, there are 12 images, 12 file names and each one is added to the anim_imgs array
+
+Near the bottom of the file in the same place we edited previously to change the static image, we'll want to comment out or remove a few lines setting up the image and instead use different functions to set up our animation.
+
+```c
+int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
+    widget->obj = lv_obj_create(parent);
+    lv_obj_set_size(widget->obj, 160, 68);
+    lv_obj_t *top = lv_canvas_create(widget->obj);
+    lv_obj_align(top, LV_ALIGN_TOP_RIGHT, 0, 0);
+    lv_canvas_set_buffer(top, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
+
+    //lv_obj_t *art = lv_img_create(widget->obj);
+    //bool random = sys_rand32_get() & 1;
+    //lv_img_set_src(art, random ? &balloon : &mountain);
+    //lv_img_set_src(art, &corro01);
+
+    lv_obj_t * art = lv_animimg_create(widget->obj);            //<--
+    lv_obj_center(art);                                         //<--
+    lv_animimg_set_src(art, (const void **) anim_imgs, 12);     //<--
+    lv_animimg_set_duration(art, 4800);                         //<--
+    lv_animimg_set_repeat_count(art, LV_ANIM_REPEAT_INFINITE);  //<--
+    lv_animimg_start(art);                                      //<--
+
+    lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    sys_slist_append(&widgets, &widget->node);
+    widget_battery_status_init();
+    widget_peripheral_status_init();
+
+    return 0;
+}
+```
+
+*you can see a full example of this file under `/assets/example/animated/peripheral_status.c`*
+
+`lv_animimg_create()` creates our animation instance
+
+`lv_animimg_set_src()` is where we provide our array of images as well as the number of images in the array. **This number is important**. If it is too small your animation won't use all of the available pictures. If it is too large, it may crash or cause unexpected behavior.
+
+`lv_animimg_set_duration()` sets the total duration of your animation. In my case I wanted my animation to be 400ms per frame so I multiplied 400 * 12 to arrive at a total of 4800ms. Lower this number to speed up the animation or increase it to slow it down. I have not expirimented with how high this number can go but it's a uint32 so theoretically anything under 4.2billion milliseconds should work which means you could easily make a slow moving slideshow of images rather than an animation.
+
+`lv_animimg_set_repeat_count()` set our repeat count to infinte
+
+`lv_animimg_start()` starts our animation, if you don't include this line, it won't start
+
+
+There is now only one final step left, we need to tell the zmk build that we want to use the lvgl animation feature and we do so in the `Kconfig.defconfig` file. Update this section:
+
+```
+config NICE_VIEW_WIDGET_STATUS
+    bool "Custom nice!view status widget"
+    select LV_FONT_MONTSERRAT_16
+    select LV_USE_IMG
+    select LV_USE_CANVAS
+```
+to be this
+
+```
+config NICE_VIEW_WIDGET_STATUS
+    bool "Custom nice!view status widget"
+    select LV_FONT_MONTSERRAT_16
+    select LV_USE_IMG
+    select LV_USE_CANVAS
+    select LV_USE_ANIMIMG 
+    select LV_USE_ANIMATION
+```
+
+#### Congratulations
+That's it! You should now have a functioning custom animation that will run on your peripheral nice!view display when you build your firmware with your module and flash it.
+To learn how to use your new module with your new animation, head to the [usage](#usage) section.
+
 
 ## Usage
 
-To use this module, first add it to your config/west.yml by adding a new entry to remotes and projects:
+To use my urchin animation module as-is, first add it to your config/west.yml by adding a new entry to remotes and projects:
 
-**If you have cloned or forked this repository, replace the url-base: with your forked or cloned url base**
+**If you are using your own forked/cloned module, just replace the url-base: with your forked or cloned url base**
 
 ```yml
 manifest:
@@ -270,13 +391,13 @@ manifest:
     path: config
 ```
 
-Now simply swap out the default nice_view shield on the board for the custom one in your build.yaml file.
+Now simply swap out the default nice_view shield for the custom one in your build.yaml file.
 
 ```yml
 ---
 include:
   - board: nice_nano_v2
-    shield: urchin_left nice_view_adapter  nice_view_custom #custom shield
+    shield: urchin_left nice_view_adapter nice_view_custom #custom shield
   - board: nice_nano_v2
     shield: urchin_right nice_view_adapter nice_view_custom #custom shield
 ```
@@ -333,6 +454,26 @@ The file names inside that folder:
 
 Inside `nice_view_custom.zmk.yml` update the Id and perhaps the name (though not strictly necessary)
 
-Inside Kconfig.shield update line 5 and line 4, then update whatever you change the config name for line 4 to be, you want line 4 of Kconfig.defconfg to match it. 
+Inside Kconfig.shield update line 5 and line 4, then whatever you change the config name for line 4 to be, you want line 4 of Kconfig.defconfg to match it. 
 
 That should be everything, letting you share your customized animation or graphic module with others using your desired name.
+
+
+---
+
+
+### References
+
+I in no way figured this out on my own and want to give credit where it is due. These are all the resources I used to learn.
+
+https://www.reddit.com/r/ErgoMechKeyboards/comments/15t3o6k/custom_art_on_niceview_displays/
+
+https://github.com/mctechnology17/zmk-dongle-display-view
+
+https://github.com/caksoylar/zmk-rgbled-widget
+
+https://deploy-preview-2438--zmk.netlify.app/docs/advanced-guides/making-modules
+
+https://docs.zephyrproject.org/latest/develop/modules.html
+
+https://docs.lvgl.io/master/widgets/animimg.html
