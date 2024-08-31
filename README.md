@@ -17,6 +17,9 @@ If you just want to use my custom urchin animation and don't care how to make yo
 4. [Converting Your Art](#converting-your-art)
 5. [Brief Explanation of the Module](#brief-explanation-of-the-module)
 6. [Adding a Static Image](#adding-a-static-image)
+7. [Adding an Animation](#adding-an-animation)
+8. [Using the Module](#usage)
+9. [References](#references)
 
 ---
 
