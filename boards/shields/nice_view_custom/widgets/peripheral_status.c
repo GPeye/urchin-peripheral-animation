@@ -36,7 +36,20 @@ LV_IMG_DECLARE(corro10);
 LV_IMG_DECLARE(corro11);
 LV_IMG_DECLARE(corro12);
 
-
+const lv_img_dsc_t *anim_imgs[] = {
+    &corro01,
+    &corro02,
+    &corro03,
+    &corro04,
+    &corro05,
+    &corro06,
+    &corro07,
+    &corro08,
+    &corro09,
+    &corro10,
+    &corro11,
+    &corro12,
+};
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
