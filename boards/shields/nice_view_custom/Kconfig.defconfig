@@ -35,6 +35,8 @@ config NICE_VIEW_WIDGET_STATUS
     select LV_FONT_MONTSERRAT_16
     select LV_USE_IMG
     select LV_USE_CANVAS
+    select LV_USE_ANIMIMG 
+    select LV_USE_ANIMATION
 
 config NICE_VIEW_WIDGET_INVERTED
     bool "Invert custom status widget colors"

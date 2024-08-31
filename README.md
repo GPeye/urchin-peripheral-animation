@@ -25,7 +25,7 @@ If you just want to use my custom urchin animation and don't care how to make yo
 
 Ultimately we are going to implement a 12 frame animation of the unofficial Rust-lang unsafe code mascot, Corro the sea urchin.
 
-Why? Because my main keyboard right now is [duckyb's variant of the ferris sweep that uses the nice!view displays, called the urchin](https://github.com/duckyb/urchin). It's emblazoned with a cute little corro graphic on the pcb with silk-screening 
+Why? Because my main keyboard right now is [duckyb's variant of the ferris sweep that uses the nice!view displays, called the urchin](https://github.com/duckyb/urchin). It's emblazoned with a cute little corro graphic on the pcb. 
 
 
 ![urchin board](https://raw.githubusercontent.com/duckyb/urchin/master/gallery/main/main-top.png)
@@ -42,14 +42,14 @@ So, I took this little dude and made a little 1bit animation that looks like thi
 
 and then I put it on the urchin board like this:
 
-![urchinvid](./assets/20240829_081212.mp4)
+![urchinvid](./assets/corroniceview.gif)
 
 If that seems like something you'd like to do, keep reading...
 
 
 ## Getting Started
 
-Fork or Clone this nice!view module [https://github.com/GPeye/nice-view-mod](https://github.com/GPeye/nice-view-mod)
+Step one is to Fork or Clone this nice!view module repo: [https://github.com/GPeye/nice-view-mod](https://github.com/GPeye/nice-view-mod)
 
 That repo is an exact copy of the same nice!view shield found in the official ZMK firmware repo, just wrapped up in a module.
 
@@ -62,7 +62,7 @@ Once you have your fork/clone, we'll need some art...
 
 ## Making the Art
 
-*For learning the code part of this, feel free to use the assets under the assets folder in this repo and skip this step*
+*For just learning the code part of this, feel free to use the assets under the assets folder in this repo and skip this step*
 
 The current nice!view peripheral mountain and balloon images are **68px wide by 140px tall** (sort've*) so, to easily swap out for some other art, any image we want to make or use should also be that size. I use aseprite which is a paid software, but pixel art at this size can easily be made in gimp or ms paint for free, or even using in browser tools like [piskel](https://www.piskelapp.com/p/create/sprite) or [pixilart](https://www.pixilart.com/draw) which even have helpers for creating animation.
 
@@ -72,13 +72,13 @@ Use **only** black and white to create your art as the nice!view does not suppor
 
 Regardless of the tool you are using, you will want to export your art to a png format. If you created an animation you will want to export each frame as an individual png rather than as a spritesheet.
 
-Check out the `/assets/urchinpngart` folder for my example urchin 68x140 1 bit pixel art.
+Check out the `/assets/urchinpngart` folder for my example urchin 68x140 1-bit pixel art.
 
 ## Converting Your Art
 
 **The first step is** to take your 68x140 art and make it 140x68 by **rotating it 90 degrees clockwise**.
 
-**Why?** the nice!view is not a vertical display, it's actually a horizontal display that's in a vertical orientation usually because it fits better on a keyboard that way. If you've ever built your firmware with the default ZMK display status screen you may have noticed this. 
+**Why?** the nice!view is not a vertical display, it's actually a horizontal display that's usually in a vertical orientation because it fits better on a keyboard that way. If you've ever built your firmware with the default ZMK display status screen you may have noticed this as the battery and connection widget will be sideways.
 
 Once you have rotated all your art, we need to convert it to a lvgl C array by heading to https://lvgl.io/tools/imageconverter and selecting your images, one at a time, and converting them by selecting LVGL v8, Color Format: `CF_ALPHA_1_BIT` and output format as `C array`
 
