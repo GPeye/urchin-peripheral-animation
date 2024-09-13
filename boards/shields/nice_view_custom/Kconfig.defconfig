@@ -4,7 +4,7 @@
 if SHIELD_NICE_VIEW_CUSTOM
 
 config CUSTOM_ANIMATION_SPEED
-    int
+    int "Total duration in milliseconds for animation to take"
     default 9600
 
 config LV_Z_VDB_SIZE
