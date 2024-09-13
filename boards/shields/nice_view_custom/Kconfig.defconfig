@@ -5,7 +5,7 @@ if SHIELD_NICE_VIEW_CUSTOM
 
 config CUSTOM_ANIMATION_SPEED
     int
-    default 100
+    default 9600
 
 config LV_Z_VDB_SIZE
     default 100
