@@ -405,6 +405,16 @@ include:
     shield: urchin_right nice_view_adapter nice_view_custom #custom shield
 ```
 
+by default the this urchin animation will run for a duration of 9.6 seconds, fairly slow to save battery
+
+If you want to change the speed of the animation, you can edit the speed by changing the CONFIG_CUSTOM_ANIMATION_SPEED in your .conf file
+
+For example:
+
+```conf
+# urchin.conf
+CONFIG_CUSTOM_ANIMATION_SPEED=4800 # 4.8 second total duration
+```
 
 ## Renaming your module
 What if you want to name your module something other than "nice_view_custom"?
