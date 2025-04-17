@@ -83,7 +83,7 @@ Check out the `/assets/urchinpngart` folder for my example urchin 68x140 1-bit p
 
 **Why?** the nice!view is not a vertical display, it's actually a horizontal display that's usually in a vertical orientation because it fits better on a keyboard that way. If you've ever built your firmware with the default ZMK display status screen you may have noticed this as the battery and connection widget will be sideways.
 
-Once you have rotated all your art, we need to convert it to a lvgl C array by heading to https://lvgl.io/tools/imageconverter and selecting your images, one at a time, and converting them by selecting LVGL v8, Color Format: `CF_ALPHA_1_BIT` and output format as `C array`
+Once you have rotated all your art, we need to convert it to a lvgl C array by heading to https://lvgl.io/tools/imageconverter and selecting your images, one at a time, and converting them by selecting LVGL v8, Color Format: `CF_INDEXED_1_BIT` and output format as `C array`
 
 ![lvglsetting](./assets/lvgl.png)
 
